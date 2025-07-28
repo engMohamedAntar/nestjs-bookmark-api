@@ -1,0 +1,22 @@
+#docker-compose.yml
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: bookMark_db
+      POSTGRES_USER: mohamed
+      POSTGRES_PASSWORD: pass123
+    ports:
+      - 5433:5432
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8083:8080
+
+volumes:
+  postgres-db:
