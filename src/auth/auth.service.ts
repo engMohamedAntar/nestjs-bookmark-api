@@ -3,20 +3,40 @@ import * as bcrypt from 'bcrypt';
 
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { SignUpDto } from 'src/dto/signup.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserResponseDto } from 'src/dto/userResponse.dto';
 import { Prisma } from '@prisma/client';
+import { SignInDto } from 'src/dto/signin.dto';
 
 
 @Injectable()
 export class AuthService {
   constructor(private prismaService: PrismaService) {}
-  signIn() {
-    return { msg: 'I have signed in' };
+
+  async signIn(body: SignInDto): Promise<UserResponseDto> {
+    // find user
+    const user= await this.prismaService.user.findFirst({
+      where:{
+        email: body.email
+      }
+    });
+    
+    // check if exit or not
+    if(!user)
+      throw new NotFoundException(`No user found for this email ${body.email}`);
+    // compare passwords
+    const mached= await bcrypt.compare(body.password, user.hash);
+    
+    if(!mached)
+      throw new ForbiddenException('invalid email or password');
+    // return the user if exit
+    return new UserResponseDto(user); 
   }
 
   async signUp(body: SignUpDto): Promise<UserResponseDto> {
