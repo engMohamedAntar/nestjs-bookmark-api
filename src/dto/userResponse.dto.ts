@@ -11,8 +11,10 @@ export class UserResponseDto{
     hash: string;
     createdAt: Date;
     updatedAt: Date;
+    token: string;
     
-    constructor(partial: Partial<UserResponseDto>){
+    constructor(partial: Partial<UserResponseDto>, token: string){
         Object.assign(this, partial);
+        this.token= token;
     }
 }
