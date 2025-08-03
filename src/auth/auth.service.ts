@@ -37,8 +37,9 @@ export class AuthService {
     const mached = await bcrypt.compare(body.password, user.hash);
 
     if (!mached) throw new ForbiddenException('invalid email or password');
+
     // return the user if exit
-    const token= this.jwtService.sign({sub: user.id, firstName: user.firstName});
+    const token = this.signToken(user.id, user.email);
     return new UserResponseDto(user, token);
   }
 
@@ -56,10 +57,10 @@ export class AuthService {
           lastName: body.lastName,
         },
       });
-      const token = this.jwtService.sign({
-        sub: user.id,
-        firstname: user.firstName,
-      });
+
+      //create a token
+      const token = this.signToken(user.id, user.email);
+
       //return the created user
       return new UserResponseDto(user, token);
     } catch (err) {
@@ -70,5 +71,11 @@ export class AuthService {
         throw new BadRequestException('email already exist');
       throw new InternalServerErrorException('Internal server error');
     }
+  }
+
+  signToken(id: number, email: string): string {
+    const payload = { sub: id, firstname: email };
+    const token = this.jwtService.sign(payload);
+    return token;
   }
 }
