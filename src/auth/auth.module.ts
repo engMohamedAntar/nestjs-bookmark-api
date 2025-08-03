@@ -4,10 +4,10 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthGuard } from './auth.guard';
+import { JwtStrategy } from './strategies/jwt-strategy';
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, AuthGuard],
+  providers: [AuthService, JwtStrategy],
   imports: [
     JwtModule.registerAsync({
       imports: [ConfigModule],
