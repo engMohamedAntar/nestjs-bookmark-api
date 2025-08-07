@@ -1,8 +1,9 @@
 //user.controller.ts
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { User } from '@prisma/client';
 
 @Controller('users')
 export class UserController {
@@ -10,9 +11,14 @@ export class UserController {
   
   @UseGuards(AuthGuard('jwt'))
   @Get('/')
-  getAllUsers(@Req() req: Request){
-    console.log(req.user);
-    
-    return this.userSirvice.getAllUsers();
-  } 
+  getAllUsers(){
+    return this.userSirvice.getAllUsers(); 
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/getMe')
+  getMe(@GetUser() user: User){
+    return user;
+  }
+
 }
