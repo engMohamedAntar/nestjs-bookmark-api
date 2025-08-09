@@ -11,9 +11,9 @@ import {
 import { SignUpDto } from 'src/dto/signup.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserResponseDto } from 'src/dto/userResponse.dto';
-import { Prisma } from '@prisma/client';
 import { SignInDto } from 'src/dto/signin.dto';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaClientKnownRequestError } from 'generated/prisma/runtime/library';
 
 @Injectable()
 export class AuthService {
@@ -65,7 +65,7 @@ export class AuthService {
       return new UserResponseDto(user, token);
     } catch (err) {
       if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err instanceof PrismaClientKnownRequestError &&
         err.code === 'P2002'
       )
         throw new BadRequestException('email already exist');
