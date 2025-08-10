@@ -1,5 +1,5 @@
 //user.controller.ts
-import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
@@ -12,8 +12,8 @@ export class UserController {
   constructor(private userSirvice: UserService) {}
 
   @Get('/')
-  getAllUsers() {
-    return this.userSirvice.getAllUsers();
+  getAllUsers(@Query() query) {    
+    return this.userSirvice.getAllUsers(query);
   }
 
   @Get('/getMe')
