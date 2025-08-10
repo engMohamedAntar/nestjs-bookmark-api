@@ -7,14 +7,14 @@ export class UserService {
   constructor(private prismaService: PrismaService) {}
 
   async getAllUsers(query: any) {
-    const { sort, fields, keyword, ...filter } = query;
+    const { sort, fields, keyword, limit, page, ...filter } = query;
 
     //keyword searching
-    if(keyword) {
-      filter.OR=[
-        {firstName: {contains: keyword, mode: 'insensitive'}},
-        {lastName: {contains: keyword, mode: 'insensitive'}},
-      ]
+    if (keyword) {
+      filter.OR = [
+        { firstName: { contains: keyword, mode: 'insensitive' } },
+        { lastName: { contains: keyword, mode: 'insensitive' } },
+      ];
     }
     //sorting
     let orderBy: any = undefined;
@@ -39,10 +39,16 @@ export class UserService {
       }, {});
     }
 
+    //pagination
+    const take = limit ? limit * 1 : 10;
+    const skip = page ? (page - 1) * take : 0;
+
     const users = await this.prismaService.user.findMany({
       where: filter,
       orderBy,
       select, // {firstName: true, lastName: true}
+      take,
+      skip,
     });
     return users;
   }
