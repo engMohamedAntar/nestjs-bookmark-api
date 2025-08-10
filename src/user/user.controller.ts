@@ -12,7 +12,7 @@ export class UserController {
   constructor(private userSirvice: UserService) {}
 
   @Get('/')
-  getAllUsers(@Query() query) {    
+  getAllUsers(@Query() query) {   
     return this.userSirvice.getAllUsers(query);
   }
 

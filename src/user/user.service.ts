@@ -40,8 +40,8 @@ export class UserService {
     }
 
     //pagination
-    const take = limit ? limit * 1 : 10;
-    const skip = page ? (page - 1) * take : 0;
+    const take = limit ? parseInt(limit): 10;
+    const skip = page ? (parseInt(page)-1) * take : 0;
 
     const users = await this.prismaService.user.findMany({
       where: filter,
@@ -50,7 +50,21 @@ export class UserService {
       take,
       skip,
     });
-    return users;
+
+    //paginationInfo
+    const total = await this.prismaService.user.count({ where: filter });
+    const totalPages = Math.ceil(total / take);
+    const currentPage= page? parseInt(page): 1;
+
+    const paginationInfo = {
+      results: users.length,
+      total,
+      currentPage,
+      totalPages,
+      prev: currentPage > 1 ? currentPage - 1 : undefined,
+      next: currentPage < totalPages ? currentPage + 1 : undefined,
+    };
+    return { paginationInfo, users };
   }
 
   async editUser(userId, body) {
