@@ -1,3 +1,4 @@
+//PrismaApiFeatures.ts
 export class PrismaApiFeatures {
   private filter: any;
   private orderBy: any;
@@ -7,7 +8,7 @@ export class PrismaApiFeatures {
   private keyword: string;
   private page: number;
   constructor(
-    private query,
+    private query: Record<string,any>,
     private searchFields: string[],
   ) {
     //extract the query

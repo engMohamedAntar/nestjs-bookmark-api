@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { BookmarkService } from './bookmark.service';
@@ -23,8 +24,8 @@ export class BookmarkController {
   constructor(private bookmarkService: BookmarkService) {}
 
   @Get()
-  getAllBookmarks(@GetUser('id') userId) {
-    return this.bookmarkService.getAllBookmarks(userId);
+  getAllBookmarks(@GetUser('id') userId, @Query() query) {
+    return this.bookmarkService.getAllBookmarks(userId, query);
   }
 
   @Get('/:id')

@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Bookmark } from 'generated/prisma';
+import { PrismaApiFeatures } from 'src/common/utils/PrismaApiFeatures';
 import { CreateBookmarkDto } from 'src/dto/create-bookmark-dto';
 import { UpdateBookmarkDto } from 'src/dto/update-bookmark-dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -13,13 +14,25 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class BookmarkService {
   constructor(private prismaService: PrismaService) {}
 
-  async getAllBookmarks(userId: number): Promise<Bookmark[]> {
-    const bookmarks = await this.prismaService.bookmark.findMany({
-      where: {
-        userId,
-      },
+  async getAllBookmarks(userId: number, query: any) {
+    const apiFeatures = new PrismaApiFeatures(query, ['title', 'description']);
+    const options = apiFeatures.buildOptions();
+
+    options.where = {
+      ...options.where,
+      userId,
+    };
+
+    const total = await this.prismaService.bookmark.count({
+      where: options.where,
     });
-    return bookmarks;
+    const bookmarks = await this.prismaService.bookmark.findMany(options);
+
+    const paginationInfo = apiFeatures.getPaginationInfo(
+      total,
+      bookmarks.length,
+    );
+    return { paginationInfo, bookmarks };
   }
 
   async getOneBookmark(bookmarkId: number, userId: number): Promise<Bookmark> {
@@ -51,13 +64,11 @@ export class BookmarkService {
     userId: number,
     dto: UpdateBookmarkDto,
   ): Promise<Bookmark> {
-
     const bookmark = await this.prismaService.bookmark.findFirst({
       where: { id: bookmarkId, userId },
     });
 
-    if (!bookmark)
-      throw new ForbiddenException('Access denied');
+    if (!bookmark) throw new ForbiddenException('Access denied');
 
     const updatedBookmark = await this.prismaService.bookmark.update({
       where: {

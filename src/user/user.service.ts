@@ -7,14 +7,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async getAllUsers(query: Record<string,any>) {
-    const apiFeature= new PrismaApiFeatures(query, ['firstName', 'lastName']);
-    const options= apiFeature.buildOptions();
+  async getAllUsers(query: Record<string, any>) {
+    const apiFeature = new PrismaApiFeatures(query, ['firstName', 'lastName']);
+    const options = apiFeature.buildOptions();
 
-    const users= await this.prismaService.user.findMany(options);
-    const total= await this.prismaService.user.count({where: options.where});
+    const users = await this.prismaService.user.findMany(options);
+    const total = await this.prismaService.user.count({ where: options.where });
 
-    const paginationInfo= apiFeature.getPaginationInfo(total ,users.length)
+    const paginationInfo = apiFeature.getPaginationInfo(total, users.length);
     return { paginationInfo, users };
   }
 
@@ -29,6 +29,8 @@ export class UserService {
       },
     });
     const { hash, ...userWithoutHash } = user;
+    console.log(`from user.service editUser function ${hash}`);
+
     return userWithoutHash;
   }
 }
